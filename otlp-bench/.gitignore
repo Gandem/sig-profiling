@@ -1,0 +1,5 @@
+.opentelemetry-proto
+/internal/otlpbuild/testdata/tmp
+/internal/otlpbuild/testdata/dst
+/internal/otlpversions/tmp
+otlp-bench-results
