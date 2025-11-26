@@ -89,12 +89,16 @@ if ! command -v docker &> /dev/null; then
 
     log_info "Installing Docker packages..."
     sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-
-    sudo usermod -aG docker $USER
-    log_success "Docker installed (log out and back in for group changes to take effect)"
+    log_success "Docker installed"
 else
     log_success "Docker already installed"
 fi
+
+# Ensure current user can access Docker socket without sudo
+log_info "Adding $USER to docker group..."
+sudo usermod -aG docker "$USER"
+newgrp docker
+log_success "Added $USER to docker group"
 
 # =============================================================================
 # Section 3: Kubernetes Tools (from official apt repository)
@@ -243,9 +247,4 @@ echo "  minikube:    $(minikube version --short 2>/dev/null)"
 echo "  cri-dockerd: $(cri-dockerd --version 2>&1 | head -1)"
 echo ""
 echo "To start minikube with driver=none, run:"
-echo "  sudo minikube start --driver=none"
-echo ""
-echo "Note: With driver=none, minikube commands require sudo."
-echo "After starting minikube, fix permissions with:"
-echo "  sudo chown -R \$USER \$HOME/.kube \$HOME/.minikube"
-echo "  chmod -R u+wrx \$HOME/.kube \$HOME/.minikube"
+echo "  minikube start --driver=none"
