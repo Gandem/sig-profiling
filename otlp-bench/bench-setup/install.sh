@@ -197,7 +197,28 @@ else
 fi
 
 # =============================================================================
-# Section 7: System Configuration for Kubernetes
+# Section 7: Helm (from official apt repository)
+# =============================================================================
+
+log_section "Installing Helm"
+
+if ! command -v helm &> /dev/null; then
+    if [ ! -f /etc/apt/sources.list.d/helm-stable-debian.list ]; then
+        log_info "Adding Helm apt repository..."
+        curl -fsSL https://packages.buildkite.com/helm-linux/helm-debian/gpgkey | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg > /dev/null
+        echo "deb [signed-by=/usr/share/keyrings/helm.gpg] https://packages.buildkite.com/helm-linux/helm-debian/any/ any main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list > /dev/null
+        sudo apt-get update
+    fi
+
+    log_info "Installing Helm..."
+    sudo apt-get install -y helm
+    log_success "Helm installed"
+else
+    log_success "Helm already installed"
+fi
+
+# =============================================================================
+# Section 8: System Configuration for Kubernetes
 # =============================================================================
 
 log_section "Configuring system for Kubernetes"
@@ -243,6 +264,7 @@ echo "Versions installed:"
 echo "  Docker:      $(docker --version 2>/dev/null | cut -d' ' -f3 | tr -d ',')"
 echo "  kubectl:     $(kubectl version --client -o yaml 2>/dev/null | grep gitVersion | cut -d: -f2 | tr -d ' ')"
 echo "  minikube:    $(minikube version --short 2>/dev/null)"
+echo "  helm:        $(helm version --short 2>/dev/null)"
 echo "  cri-dockerd: $(cri-dockerd --version 2>&1 | head -1)"
 echo ""
 echo "⚠️  To activate docker group membership, either:"
