@@ -97,8 +97,7 @@ fi
 # Ensure current user can access Docker socket without sudo
 log_info "Adding $USER to docker group..."
 sudo usermod -aG docker "$USER"
-newgrp docker
-log_success "Added $USER to docker group"
+log_success "Added $USER to docker group (requires re-login to take effect)"
 
 # =============================================================================
 # Section 3: Kubernetes Tools (from official apt repository)
@@ -246,5 +245,9 @@ echo "  kubectl:     $(kubectl version --client -o yaml 2>/dev/null | grep gitVe
 echo "  minikube:    $(minikube version --short 2>/dev/null)"
 echo "  cri-dockerd: $(cri-dockerd --version 2>&1 | head -1)"
 echo ""
-echo "To start minikube with driver=none, run:"
+echo "⚠️  To activate docker group membership, either:"
+echo "    - Log out and back in, OR"
+echo "    - Run: newgrp docker"
+echo ""
+echo "Then start minikube with:"
 echo "  minikube start --driver=none"
